@@ -51,6 +51,10 @@ func trim(line string) string {
 	return strings.Trim(line, "\n\r\t ")
 }
 
+func rmMultipleSpaces(line string) string {
+	return strings.Join(strings.Fields(line), " ")
+}
+
 func partition(line, delim string) (string, string) {
 	entries := strings.SplitN(line, delim, 2)
 	if len(entries) != 2 {
@@ -130,7 +134,7 @@ func ParseOne(reader *bufio.Reader) (*ChangelogEntry, error) {
 	_, signoff = partition(signoff, "--")  /* Get rid of the leading " -- " */
 	whom, when := partition(signoff, "  ") /* Split on the "  " */
 	changeLog.ChangedBy = trim(whom)
-	changeLog.When, err = time.Parse(whenLayout, trim(when))
+	changeLog.When, err = time.Parse(whenLayout, rmMultipleSpaces(trim(when)))
 	if err != nil {
 		return nil, fmt.Errorf("Failed parsing When %q: %v", when, err)
 	}
